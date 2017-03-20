@@ -7,9 +7,10 @@ using System.Collections.Generic;
 using System.Linq;
 using DocumentFormat.OpenXml.Validation;
 using Resx = Kinetix.Reporting.Test.Resources.Resource;
+using System.Reflection;
 using System.IO;
 using System.Drawing;
-using Kinetix.Reporting;
+
 
 namespace Kinetix.Reporting.Test {
     /// <summary>
@@ -19,7 +20,7 @@ namespace Kinetix.Reporting.Test {
     public class PowerpointHelperTest {
 
         private static readonly OpenXmlValidator validator = new OpenXmlValidator();
-            
+
         #region CreatePresentationWithOneEmptySlide
 
         /// <summary>
@@ -29,6 +30,9 @@ namespace Kinetix.Reporting.Test {
         public void CreatePresentationWithOneEmptySlide_Valid() {
             PresentationDocument pres = PowerpointHelper.CreatePresentationWithOneEmptySlide("./testFile0.pptx");
             Assert.IsTrue(pres.PresentationPart.SlideParts.Count() > 0);
+
+            var errors = validator.Validate(pres);
+            Assert.IsTrue(errors.Count() == 0);
         }
 
         /// <summary>
@@ -38,6 +42,9 @@ namespace Kinetix.Reporting.Test {
         public void CreatePresentationWithOneEmptySlide_CustomAttributes_Valid() {
             PresentationDocument pres = PowerpointHelper.CreatePresentationWithOneEmptySlide("./testFile1.pptx", 9989900, 998990);
             Assert.IsTrue(pres.PresentationPart.SlideParts.Count() > 0);
+
+            var errors = validator.Validate(pres);
+            Assert.IsTrue(errors.Count() == 0);
         }
 
         /// <summary>
@@ -97,6 +104,9 @@ namespace Kinetix.Reporting.Test {
             PresentationDocument pres = PowerpointHelper.CreatePresentationWithOneEmptySlide("./testFile2.pptx");
 
             ShapeTree shapeTree = PowerpointHelper.GetShapeTreeOfFirstSlide(pres);
+
+            var errors = validator.Validate(shapeTree);
+            Assert.IsTrue(errors.Count() == 0);
         }
 
         #endregion
@@ -114,6 +124,9 @@ namespace Kinetix.Reporting.Test {
             list.Add(new int[] { 5, 6 });
 
             Shape polygon = PowerpointHelper.CreatePolygon(list);
+
+            var errors = validator.Validate(polygon);
+            Assert.IsTrue(errors.Count() == 0);
         }
 
         /// <summary>
@@ -127,6 +140,9 @@ namespace Kinetix.Reporting.Test {
             list.Add(new int[] { 5, 6 });
 
             Shape polygon = PowerpointHelper.CreatePolygon(list, "AFAFAF");
+
+            var errors = validator.Validate(polygon);
+            Assert.IsTrue(errors.Count() == 0);
         }
 
         /// <summary>
@@ -169,7 +185,7 @@ namespace Kinetix.Reporting.Test {
         }
 
         #endregion
-        
+
         #region AddElement
 
         /// <summary>
@@ -283,7 +299,7 @@ namespace Kinetix.Reporting.Test {
         }
 
         #endregion
-        
+
         #region AddCenteredParagraph
         /// <summary>
         /// Test l'ajout d'un paragraphe centré à un autre élément.
@@ -313,10 +329,10 @@ namespace Kinetix.Reporting.Test {
         /// </summary>
         [TestMethod]
         public void CreateRectangleShape_Valid() {
-            Shape rectangle = PowerpointHelper.CreateRectangleShape(50,50,50,50);
-            
+            Shape rectangle = PowerpointHelper.CreateRectangleShape(50, 50, 50, 50);
+
             PowerpointHelper.AddParagraph(rectangle, "text");
-            
+
             var errors = validator.Validate(rectangle);
             Assert.IsTrue(errors.Count() == 0);
         }
@@ -326,10 +342,10 @@ namespace Kinetix.Reporting.Test {
         /// </summary>
         [TestMethod]
         public void CreateRectangleShape_CustomAttributes_Valid() {
-            Shape rectangle = PowerpointHelper.CreateRectangleShape(50,50,50,50, "AFAFAF", D.TextAnchoringTypeValues.Bottom, D.TextWrappingValues.None);
-            
+            Shape rectangle = PowerpointHelper.CreateRectangleShape(50, 50, 50, 50, "AFAFAF", D.TextAnchoringTypeValues.Bottom, D.TextWrappingValues.None);
+
             PowerpointHelper.AddParagraph(rectangle, "text");
-            
+
             var errors = validator.Validate(rectangle);
             Assert.IsTrue(errors.Count() == 0);
         }
@@ -383,7 +399,7 @@ namespace Kinetix.Reporting.Test {
         /// </summary>
         [TestMethod]
         public void AddTextRun_Valid() {
-            Shape rectangle = PowerpointHelper.CreateRectangleShape(50,50,50,50);
+            Shape rectangle = PowerpointHelper.CreateRectangleShape(50, 50, 50, 50);
             D.Paragraph paragraph = PowerpointHelper.AddParagraph(rectangle, "text");
 
             int oldNbTextRun = paragraph.Descendants<D.Run>().Count();
@@ -464,6 +480,9 @@ namespace Kinetix.Reporting.Test {
         [TestMethod]
         public void CreateGroupShape_Valid() {
             GroupShape groupShape = PowerpointHelper.CreateGroupShape(50, 50, 50, 50);
+
+            var errors = validator.Validate(groupShape);
+            Assert.IsTrue(errors.Count() == 0);
         }
 
         /// <summary>
@@ -472,6 +491,9 @@ namespace Kinetix.Reporting.Test {
         [TestMethod]
         public void CreateGroupShape_ZerosValues_Valid() {
             GroupShape groupShape = PowerpointHelper.CreateGroupShape(-10, -10, 0, 0);
+
+            var errors = validator.Validate(groupShape);
+            Assert.IsTrue(errors.Count() == 0);
         }
 
         /// <summary>
@@ -504,6 +526,9 @@ namespace Kinetix.Reporting.Test {
             GroupShape groupShape = PowerpointHelper.CreateGroupShape(50, 50, 50, 50);
 
             PowerpointHelper.ResizeGroup(groupShape, 100, 10);
+
+            var errors = validator.Validate(groupShape);
+            Assert.IsTrue(errors.Count() == 0);
         }
 
         /// <summary>
@@ -514,6 +539,9 @@ namespace Kinetix.Reporting.Test {
             GroupShape groupShape = PowerpointHelper.CreateGroupShape(50, 50, 50, 50);
 
             PowerpointHelper.ResizeGroup(groupShape, 0, 0);
+
+            var errors = validator.Validate(groupShape);
+            Assert.IsTrue(errors.Count() == 0);
         }
 
         /// <summary>
@@ -550,7 +578,10 @@ namespace Kinetix.Reporting.Test {
             Shape rectangle1 = PowerpointHelper.CreateRectangleShape(50, 10, 10, 20);
             Shape rectangle2 = PowerpointHelper.CreateRectangleShape(10, 20, 30, 40);
 
-            PowerpointHelper.CreateConnectionShape(rectangle1, rectangle2, new int[] { 1, 2 }, new int[] { 3, 4 });
+            ConnectionShape cShape = PowerpointHelper.CreateConnectionShape(rectangle1, rectangle2, new int[] { 1, 2 }, new int[] { 3, 4 });
+
+            var errors = validator.Validate(cShape);
+            Assert.IsTrue(errors.Count() == 0);
         }
 
         /// <summary>
@@ -588,7 +619,7 @@ namespace Kinetix.Reporting.Test {
         public void AddImage_Valid() {
             PresentationDocument pres = PowerpointHelper.CreatePresentationWithOneEmptySlide("./testFileI.pptx");
             ShapeTree shapeTree = PowerpointHelper.GetShapeTreeOfFirstSlide(pres);
-            GroupShape groupShape = PowerpointHelper.CreateGroupShape(50,50,50,50);
+            GroupShape groupShape = PowerpointHelper.CreateGroupShape(50, 50, 50, 50);
             PowerpointHelper.AddElement(shapeTree, groupShape);
             Bitmap logo = Resx.klee;
 
@@ -599,6 +630,8 @@ namespace Kinetix.Reporting.Test {
                 PowerpointHelper.AddImage(groupShape, ms, 50, 50, 50, 50);
             }
 
+            var errors = validator.Validate(groupShape);
+            Assert.IsTrue(errors.Count() == 0);
             Assert.IsTrue(groupShape.Descendants<Picture>().Count() - oldNbPicture == 1);
         }
 
@@ -620,6 +653,8 @@ namespace Kinetix.Reporting.Test {
                 PowerpointHelper.AddImage(groupShape, ms, -50, -50, 0, 0);
             }
 
+            var errors = validator.Validate(groupShape);
+            Assert.IsTrue(errors.Count() == 0);
             Assert.IsTrue(groupShape.Descendants<Picture>().Count() - oldNbPicture == 1);
         }
 
