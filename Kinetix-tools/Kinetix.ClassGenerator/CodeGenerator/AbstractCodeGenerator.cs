@@ -652,7 +652,7 @@ namespace Kinetix.ClassGenerator.CodeGenerator {
                     if (GeneratorParameters.UseTypeSafeConstValues) {
                         WriteLine(2, String.Format("public static readonly {2}Code {0} = new {2}Code({1});", constFieldName, valueLibelle.Code, item.Name));
                     } else {
-                        WriteLine(2, String.Format("public const string {0} = {1};", constFieldName, valueLibelle.Code));
+                        WriteLine(2, String.Format("public const {0} {1} = {2};", property.DataType, constFieldName, valueLibelle.Code));
                     }
 
                     if (i < nbConstValues) {
@@ -1057,7 +1057,7 @@ namespace Kinetix.ClassGenerator.CodeGenerator {
             string nameSpaceContract = nameSpacePrefix + "Contract";
             string nameSpaceImplementation = nameSpacePrefix + "Implementation";
             var moduleMetier = ExtractModuleMetier(nameSpaceName);
-            var projectDir = Path.Combine(_outputDirectory, moduleMetier, projectName + "." + nameSpaceImplementation);
+            string projectDir = Path.Combine(GetImplementationDirectoryName(projectName), projectName + "." + nameSpaceImplementation);
             var csprojFileName = Path.Combine(projectDir, projectName + "." + nameSpaceImplementation + ".csproj");
             Console.Out.WriteLine("Generating class " + implementationName + " implementing " + interfaceName);
 
@@ -1222,6 +1222,43 @@ namespace Kinetix.ClassGenerator.CodeGenerator {
         }
 
         /// <summary>
+        /// Retourne le répertoire dans lequel générer les contrats.
+        /// </summary>
+        /// <param name="projectName">Nom du projet.</param>
+        /// <returns>Répertoire dans lequel générer les contrats.</returns>
+        private string GetContractDirectoryName(string projectName) {
+            return GetBusinessSubdirectoryName(projectName, "Contract");
+        }
+
+        /// <summary>
+        /// Retourne le répertoire dans lequel générer les objets persistants.
+        /// </summary>
+        /// <param name="projectName">Nom du projet.</param>
+        /// <returns>Répertoire dans lequel générer les objets persistants.</returns>
+        private string GetDataContractDirectoryName(string projectName) {
+            return GetBusinessSubdirectoryName(projectName, "DataContract");
+        }
+
+        /// <summary>
+        /// Retourne le répertoire d'implémentation des contrats.
+        /// </summary>
+        /// <param name="projectName">Nom du projet.</param>
+        /// <returns>Répertoire dans lequel générer les objets persistants.</returns>
+        private string GetImplementationDirectoryName(string projectName) {
+            return GetBusinessSubdirectoryName(projectName, "Implementation");
+        }
+
+        /// <summary>
+        /// Retourne le sous-répertoire de Business.
+        /// </summary>
+        /// <param name="projectName">Nom du projet.</param>
+        /// <param name="subdirectory">Sous-répertoire.</param>
+        /// <returns>Sous-répertoire de Business.</returns>
+        private string GetBusinessSubdirectoryName(string projectName, string subdirectory) {
+            return Path.Combine(_outputDirectory, projectName + "." + subdirectory);
+        }
+
+        /// <summary>
         /// Retourne le nom du répertoire dans lequel placer la classe générée à partir du ModelClass fourni.
         /// </summary>
         /// <param name="isPersistent">Trie s'il s'agit du domaine persistant.</param>
@@ -1229,9 +1266,8 @@ namespace Kinetix.ClassGenerator.CodeGenerator {
         /// <param name="nameSpace">Namespace de la classe.</param>
         /// <returns>Emplacement dans lequel placer la classe générée à partir du ModelClass fourni.</returns>
         private string GetDirectoryForModelClass(bool isPersistent, string projectName, string nameSpace) {
-            var moduleMetier = ExtractModuleMetier(nameSpace);
-            var basePath = _outputDirectory;
-            var localPath = Path.Combine(moduleMetier, projectName + "." + nameSpace);
+            var basePath = Path.Combine(isPersistent ? GetDataContractDirectoryName(projectName) : GetContractDirectoryName(projectName));
+            var localPath = nameSpace.Replace('.', Path.DirectorySeparatorChar);
             string path = isPersistent ? Path.Combine(basePath, localPath) : Path.Combine(basePath, localPath, "Dto");
             return Path.Combine(path, "generated");
         }
@@ -1244,9 +1280,8 @@ namespace Kinetix.ClassGenerator.CodeGenerator {
         /// <param name="nameSpace">Namespace de la classe.</param>
         /// <returns>Nom du répertoire contenant le csproj.</returns>
         private string GetDirectoryForProject(bool isPersistent, string projectName, string nameSpace) {
-            var moduleMetier = ExtractModuleMetier(nameSpace);
-            var basePath = _outputDirectory;
-            var localPath = Path.Combine(moduleMetier, projectName + "." + nameSpace);
+            var basePath = Path.Combine(isPersistent ? GetDataContractDirectoryName(projectName) : GetContractDirectoryName(projectName));
+            var localPath = nameSpace.Replace('.', Path.DirectorySeparatorChar);
             return Path.Combine(basePath, localPath);
         }
 

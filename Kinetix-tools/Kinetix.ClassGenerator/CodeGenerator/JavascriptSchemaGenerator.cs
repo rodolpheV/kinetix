@@ -24,7 +24,7 @@ namespace Kinetix.ClassGenerator.CodeGenerator {
                 writer.WriteLine(TAB + TAB + TAB + "domain: 'DO_" + property.Name.ToUpper() + "'" + COMA);
             }
 
-            writer.WriteLine(TAB + TAB + TAB + "required: " + (property.DataMember.IsRequired ? "true" : "false"));
+            writer.WriteLine(TAB + TAB + TAB + "isRequired: " + (property.DataMember.IsRequired ? "true" : "false"));
             WriteCloseBracket(writer, 2, isLast);
         }
     }
