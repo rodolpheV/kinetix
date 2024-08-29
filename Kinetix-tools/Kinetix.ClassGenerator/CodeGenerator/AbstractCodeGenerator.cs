@@ -413,6 +413,12 @@ namespace Kinetix.ClassGenerator.CodeGenerator {
         protected abstract string LoadTableAttribute(ModelDataContract dataContract);
 
         /// <summary>
+        /// Charge l'attribut Translatable.
+        /// </summary>
+        /// <returns>Code généré.</returns>
+        protected abstract string LoadTranslatableAttribute();
+
+        /// <summary>
         /// Retourne l'attribut TypeDescriptionProvider pour la classe.
         /// </summary>
         /// <param name="classe">La classe en question.</param>
@@ -950,6 +956,10 @@ namespace Kinetix.ClassGenerator.CodeGenerator {
 
             if (property.DataMember.IsRequired && !property.DataDescription.IsPrimaryKey) {
                 WriteLine(2, LoadRequiredAttribute());
+            }
+
+            if (property.IsTranslated) {
+                WriteLine(2, LoadTranslatableAttribute());
             }
 
             if (property.DataDescription != null) {

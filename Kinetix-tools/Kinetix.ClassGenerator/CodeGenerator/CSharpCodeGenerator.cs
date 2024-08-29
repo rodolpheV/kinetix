@@ -349,6 +349,14 @@ namespace Kinetix.ClassGenerator {
         }
 
         /// <summary>
+        /// Retourne l'attribut Translatable.
+        /// </summary>
+        /// <returns>Code généré.</returns>
+        protected override string LoadTranslatableAttribute() {
+            return "[Translatable]";
+        }
+
+        /// <summary>
         /// Retourne l'attribut Display.
         /// </summary>
         /// <param name="displayName">Valeur de l'attribut Name de Display.</param>
